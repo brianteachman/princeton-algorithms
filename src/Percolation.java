@@ -16,14 +16,14 @@
  *  that the composite system is an electrical conductor?
  *---------------------------------------------------------------------------*/
 
-import edu.princeton.cs.algs4.StdRandom;
-import edu.princeton.cs.algs4.StdStats;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 
 public class Percolation {
-    private int firstElement;
-    private int lastElement;
+
+    //TODO: these are dependant on data structure, which I haven't picked yet
+    private int firstElement; // The starting row/col value, either 0 or 1
+    private int lastElement;  // The last row/col value, either n-1 or n
 
     /**
      * Create n-by-n grid, with all sites blocked
@@ -42,18 +42,23 @@ public class Percolation {
         // create the grid
     }
 
+    /* ------------------------------------------------------------------------
+     * All methods should take constant time plus a constant number of calls to
+     * the union–find methods union(), find(), connected(), and count().
+     * ----------------------------------------------------------------------*/
+
     /**
      * Open site (row, col) if it is not open already
      *
      * pre:  Object initialized (the constructor has been called)
      * post: Open site (row, col) if it is not open already
      *
-     * @param row
-     * @param col
+     * @param row   The row component of the site, in the range 1..n
+     * @param col   The column component of the site, in the range 1..n
      * @return void
      */
     public void open(int row, int col) throws IllegalArgumentException {
-        if (isValidArrayBounds(row, col)) {
+        if (isValidSiteBounds(row, col)) {
             throw new IllegalArgumentException("Either the row or the column is out of bounds.");
         }
 
@@ -67,12 +72,12 @@ public class Percolation {
     /**
      * Is site (row, col) open?
      *
-     * @param row
-     * @param col
+     * @param row   The row component of the site, in the range 1..n
+     * @param col   The column component of the site, in the range 1..n
      * @return boolean
      */
     public boolean isOpen(int row, int col) throws IllegalArgumentException  {
-        if (isValidArrayBounds(row, col)) {
+        if (isValidSiteBounds(row, col)) {
             throw new IllegalArgumentException("Either the row or the column is out of bounds.");
         }
         return false;
@@ -81,12 +86,12 @@ public class Percolation {
     /**
      * Is site (row, col) full?
      *
-     * @param row
-     * @param col
+     * @param row   The row component of the site, in the range 1..n
+     * @param col   The column component of the site, in the range 1..n
      * @return boolean
      */
     public boolean isFull(int row, int col) throws IllegalArgumentException {
-        if (isValidArrayBounds(row, col)) {
+        if (isValidSiteBounds(row, col)) {
             throw new IllegalArgumentException("Either the row or the column is out of bounds.");
         }
         return false;
@@ -114,7 +119,7 @@ public class Percolation {
      *  Helper Methods
      *---------------------------------------------------------------------------*/
 
-    private boolean isValidArrayBounds(int row, int col) {
+    private boolean isValidSiteBounds(int row, int col) {
         return row < this.firstElement || col < this.firstElement ||
                 row > this.lastElement || col > this.lastElement;
     }
