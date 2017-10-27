@@ -28,11 +28,13 @@ public class Percolation {
     /**
      * Create n-by-n grid, with all sites blocked
      *
-     * @param n The n value for an nxn matrix, where n >= 0
+     * Should take time proportional to n2.
+     *
+     * @param n The n value for an nxn matrix, where n > 0
      */
     public Percolation(int n) throws IllegalArgumentException {
-        if (n < 0) {
-            throw new IllegalArgumentException("N must be greater than or equal to 0.");
+        if (n <= 0) {
+            throw new IllegalArgumentException("N must be greater than 0.");
         }
         this.firstElement = 0;
         this.lastElement = n-1;
