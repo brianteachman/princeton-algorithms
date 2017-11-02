@@ -1,5 +1,5 @@
 The assignment:
--------
+---
 
 If sites are independently set to be open with probability `p` (and therefore blocked with probability `1 − p`), what is the probability that the system percolates? When `p` equals 0, the system does not percolate; when `p` equals 1, the system percolates.
 
@@ -7,16 +7,31 @@ When n is sufficiently large, there is a threshold value `p*` such that when `p 
 
 Your task is to write a program to estimate `p*`.
 
-Notes:
--------
-* Any methods or fields outside the API need to be private, except main.
-* Your Percolation class must use WeightedQuickUnionUF.
-* It's OK to use an extra row and/or column to deal with the 1-based indexing of the percolation grid.
-* Each of the methods (except the constructor) in Percolation must use a constant number of union-find operations.
+Monte Carlo Simulation:
+---
+A Monte Carlo simulation is one way to estimate the percolation threshold:
 
-Links:
--------
+1. Initialize all sites to be blocked. (site = 0)
+2. Repeat the following until the system percolates:
+    * Choose a site uniformly at random among all blocked sites.
+    * Open the site. 
+3. The fraction of sites that are opened when the system percolates provides an estimate of the percolation threshold. 
+
+Notes:
+---
+* Any methods or fields outside the API need to be private, except main.
+* Your PercolationV1 class must use WeightedQuickUnionUF.
+* It's OK to use an extra row and/or column to deal with the 1-based indexing of the percolation grid.
+* Each of the methods (except the constructor) in PercolationV1 must use a constant number of union-find operations.
+
+References:
+---
 * http://coursera.cs.princeton.edu/algs4/assignments/percolation.html
 * https://algs4.cs.princeton.edu/code/index.php
 * https://introcs.cs.princeton.edu/java/11style/
 * https://algs4.cs.princeton.edu/code/javadoc/edu/princeton/cs/algs4/WeightedQuickUnionUF.html
+* https://en.wikipedia.org/wiki/Pairing_function
+* http://szudzik.com/ElegantPairing.pdf
+* https://codepen.io/sachmata/post/elegant-pairing
+
+
