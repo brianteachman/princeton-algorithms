@@ -17,13 +17,15 @@
  *---------------------------------------------------------------------------*/
 
 import edu.princeton.cs.algs4.StdRandom;
+import edu.princeton.cs.algs4.Stopwatch;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
-    boolean[][] sites;
+//    boolean[][] sites;
+    boolean[] sites;
     int size;
-    WeightedQuickUnionUF lookup;
+    WeightedQuickUnionUF unionFind;
     int virtualTop;
     int virtualBottom;
     private int openSites;
@@ -38,18 +40,21 @@ public class Percolation {
         if (n < 1) {
             throw new IllegalArgumentException("n must greater than 0.");
         }
-        sites = new boolean[n][n];
+//        sites = new boolean[n][n];
+        sites = new boolean[n*n];
         size = n;
-        lookup = new WeightedQuickUnionUF(n*n+6);
+        unionFind = new WeightedQuickUnionUF(n*n+6);
         virtualTop = n*n;
         virtualBottom = n*n+1;
         for (int i=1; i <= size; i++) {
             for (int j = 1; j <= size; j++) {
-                sites[i-1][j-1] = false;
+                int site = getId(i, j);
+//                sites[i-1][j-1] = false;
+                sites[site] = false;
                 // connect top and bottom row to respective virtual site
-                if (i == 1) lookup.union(virtualTop, getId(i, j));
-                if (i == size) lookup.union(virtualBottom, getId(i, j));
-//                System.out.println(getId(i, j));
+                if (i == 1) unionFind.union(virtualTop, site);
+                if (i == size) unionFind.union(virtualBottom, site);
+//                System.out.println(site + " open? " + sites[site]);
             }
         }
 //        System.out.println(virtualTop);
@@ -62,40 +67,43 @@ public class Percolation {
 
         validateSiteExist(row, col);
 
+        int site = getId(row, col);
+
         // mark the site as open
-        sites[row-1][col-1] = true;
+//        sites[row-1][col-1] = true;
+        sites[site] = true;
         openSites++;
 
         // link the site to its open neighbors (use WeightedQuickUnionUF)
-        int site = getId(row, col);
-        if (isUnionable(row, col, -1, 0)) { // above
-            lookup.union(site, getId(row-1, col));
+        if (isUnionable(row-1, col)) { // above
+            unionFind.union(site, getId(row-1, col));
         }
-        if (isUnionable(row, col, 0, -1)) { // to the left
-            lookup.union(site, getId(row, col-1));
+        if (isUnionable(row, col-1)) { // to the left
+            unionFind.union(site, getId(row, col-1));
         }
-        if (isUnionable(row, col, 0, 1)) { // to the right
-            lookup.union(site, getId(row, col+1));
+        if (isUnionable(row, col+1)) { // to the right
+            unionFind.union(site, getId(row, col+1));
         }
-        if (isUnionable(row, col, 1, 0)) { // below
-            lookup.union(site, getId(row+1, col));
+        if (isUnionable(row+1, col)) { // below
+            unionFind.union(site, getId(row+1, col));
         }
+        if (row == 1) unionFind.union(virtualTop, site);
+        if (row == size) unionFind.union(virtualBottom, site);
     }
 
     // is site (row, col) open?
     // constant time
     public boolean isOpen(int row, int col) throws IllegalArgumentException {
         validateSiteExist(row, col);
-        return sites[row-1][col-1];
+//        return sites[row-1][col-1];
+        return sites[getId(row, col)];
     }
 
     // is site (row, col) full?
     // constant time
     public boolean isFull(int row, int col) throws IllegalArgumentException {
         int site = getId(row, col);
-        return isOpen(row, col)
-                && (lookup.connected(virtualTop, site)
-                    || lookup.connected(virtualBottom, site));
+        return isOpen(row, col) && unionFind.connected(virtualTop, site);
     }
 
     // number of open sites
@@ -107,7 +115,7 @@ public class Percolation {
     // does the system percolate?
     // constant time
     public boolean percolates() {
-        return lookup.connected(virtualTop, virtualBottom);
+        return unionFind.connected(virtualTop, virtualBottom);
     }
 
     /* ------------------------------------------------------------------------
@@ -126,16 +134,12 @@ public class Percolation {
     }
 
     private boolean isValidIndex(int row, int col) {
-        row -= 1;
-        col -= 1;
-        return (0 <= row && 0 <= col) && (row < size && col < size);
+        return (0 < row && 0 < col) && (row <= size && col <= size);
     }
 
-    private boolean isUnionable(int row, int col, int di, int dj) {
-        row += di;
-        col += dj;
+    private boolean isUnionable(int row, int col) {
         return this.isValidIndex(row, col) // True if doesn't run out of bounds
-                && !this.isOpen(row, col);  // and the site is open
+                && this.isOpen(row, col);  // and the site is open
         // note: isValidIndex returns false before isOpen can throw exception
     }
 
@@ -144,6 +148,7 @@ public class Percolation {
      * ----------------------------------------------------------------------*/
 
     public static void main(String[] args) {
+        Stopwatch timer = new Stopwatch();
         int weight = 10;
         int n = 20;
         Percolation perc = new Percolation(n);
@@ -159,17 +164,23 @@ public class Percolation {
 //            System.out.println(perc.isOpen(x[i], y[i]));
 //        }
 
-        double[] pvals = new double[n*n];
-        for (int i=0; i < n*n; i++) {
+        int i = 0;
+        while ( ! perc.percolates()) {
             int x = StdRandom.uniform(1, n+1);
             int y = StdRandom.uniform(1, n+1);
-
             if ( ! perc.isFull(x, y) ) {
                 perc.open(x, y);
             }
-            if (perc.percolates()) break;
+//            perc.showState();
         }
+        System.out.println("Runtime: "+timer.elapsedTime());
         System.out.println(perc.numberOfOpenSites() + " sites opened.");
         System.out.println(perc.percolates()?"It percolates.":"No percolation here.");
+    }
+
+    public void showState() {
+        for (int i=0; i<size*size; i++) {
+            System.out.println("Site " + (i+1) + ": " + (sites[i] ? "open" : "closed"));
+        }
     }
 }
