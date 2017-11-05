@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *  Author:        Brian Teachman
  *  Written:       10/27/2017
- *  Last updated:  11/2/2017
+ *  Last updated:  11/4/2017
  *
  *  Compilation:   javac Percolation.java
  *  Execution:     java Percolation
@@ -16,13 +16,12 @@
  *  that the composite system is an electrical conductor?
  *---------------------------------------------------------------------------*/
 
+import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
-import edu.princeton.cs.algs4.Stopwatch;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
-//    boolean[][] sites;
     boolean[] sites;
     int size;
     WeightedQuickUnionUF unionFind;
@@ -35,30 +34,17 @@ public class Percolation {
      * ----------------------------------------------------------------------*/
 
     // create n-by-n grid, with all sites blocked (0)
-    // time proportional to n2
+    // time proportional to n^2
     public Percolation(int n) {
         if (n < 1) {
             throw new IllegalArgumentException("n must greater than 0.");
         }
-//        sites = new boolean[n][n];
-        sites = new boolean[n*n];
         size = n;
-        unionFind = new WeightedQuickUnionUF(n*n+6);
-        virtualTop = n*n;
-        virtualBottom = n*n+1;
-        for (int i=1; i <= size; i++) {
-            for (int j = 1; j <= size; j++) {
-                int site = getId(i, j);
-//                sites[i-1][j-1] = false;
-                sites[site] = false;
-                // connect top and bottom row to respective virtual site
-                if (i == 1) unionFind.union(virtualTop, site);
-                if (i == size) unionFind.union(virtualBottom, site);
-//                System.out.println(site + " open? " + sites[site]);
-            }
-        }
-//        System.out.println(virtualTop);
-//        System.out.println(virtualBottom);
+        int numSites = n*n;
+        sites = new boolean[numSites];
+        unionFind = new WeightedQuickUnionUF(numSites+6);
+        virtualTop = numSites;
+        virtualBottom = numSites+1;
     }
 
     // open site (row, col) if it is not open already
@@ -70,11 +56,14 @@ public class Percolation {
         int site = getId(row, col);
 
         // mark the site as open
-//        sites[row-1][col-1] = true;
         sites[site] = true;
         openSites++;
 
-        // link the site to its open neighbors (use WeightedQuickUnionUF)
+        // if fist row or last row link to respective virtual node
+        if (row == 1) unionFind.union(virtualTop, site);
+        if (row == size) unionFind.union(virtualBottom, site);
+
+        // link the site to open neighbors (cardinal directions only)
         if (isUnionable(row-1, col)) { // above
             unionFind.union(site, getId(row-1, col));
         }
@@ -87,15 +76,12 @@ public class Percolation {
         if (isUnionable(row+1, col)) { // below
             unionFind.union(site, getId(row+1, col));
         }
-        if (row == 1) unionFind.union(virtualTop, site);
-        if (row == size) unionFind.union(virtualBottom, site);
     }
 
     // is site (row, col) open?
     // constant time
     public boolean isOpen(int row, int col) throws IllegalArgumentException {
         validateSiteExist(row, col);
-//        return sites[row-1][col-1];
         return sites[getId(row, col)];
     }
 
@@ -148,39 +134,17 @@ public class Percolation {
      * ----------------------------------------------------------------------*/
 
     public static void main(String[] args) {
-        Stopwatch timer = new Stopwatch();
-        int weight = 10;
-        int n = 20;
-        Percolation perc = new Percolation(n);
+        int n = (args.length > 0)? Integer.parseInt(args[0]): 20;
+        Percolation grid = new Percolation(n);
 
-        // Test can percolate
-//        int[] x = {1, 2, 3, 3, 4, 5};
-//        int[] y = {1, 1, 1, 2, 2, 2};
-//        for (int i=1; i <= n; i++) {
-//            System.out.print("Site "+perc.getId(x[i], y[i])+" open: ");
-//            System.out.println(perc.isOpen(x[i], y[i]));
-//            perc.open(x[i], y[i]);
-//            System.out.print("Site "+perc.getId(x[i], y[i])+" open: ");
-//            System.out.println(perc.isOpen(x[i], y[i]));
-//        }
-
-        int i = 0;
-        while ( ! perc.percolates()) {
+        while ( ! grid.percolates()) {
             int x = StdRandom.uniform(1, n+1);
             int y = StdRandom.uniform(1, n+1);
-            if ( ! perc.isFull(x, y) ) {
-                perc.open(x, y);
+            if ( ! grid.isOpen(x, y) ) {
+                grid.open(x, y);
             }
-//            perc.showState();
         }
-        System.out.println("Runtime: "+timer.elapsedTime());
-        System.out.println(perc.numberOfOpenSites() + " sites opened.");
-        System.out.println(perc.percolates()?"It percolates.":"No percolation here.");
-    }
-
-    public void showState() {
-        for (int i=0; i<size*size; i++) {
-            System.out.println("Site " + (i+1) + ": " + (sites[i] ? "open" : "closed"));
-        }
+        StdOut.println(grid.numberOfOpenSites() + " sites opened.");
+        StdOut.println(grid.percolates()?"It percolates.":"No percolation here.");
     }
 }

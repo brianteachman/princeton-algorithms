@@ -1,10 +1,10 @@
 /*-----------------------------------------------------------------------------
  *  Author:        Brian Teachman
  *  Written:       11/2/2017
- *  Last updated:  11/2/2017
+ *  Last updated:  11/4/2017
  *
  *  Compilation:   javac PercolationStats.java
- *  Execution:     java PercolationStats
+ *  Execution:     java PercolationStats <n> <T>
  *
  *  Project 1: Percolation, using quick union find data type. Determines if a
  *             path through an nxn matrix can be found (percolates).
@@ -12,78 +12,75 @@
  *  Run analysis of Percolation
  *---------------------------------------------------------------------------*/
 
+import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
+import edu.princeton.cs.algs4.Stopwatch;
 
 public class PercolationStats {
     int size;
     int trials;
-    Double mean;
 
     double[] pvals;
+    double[] runtimes;
 
     // perform trials independent experiments on an n-by-n grid
-    public PercolationStats(int n, int trials) {
-        if (n < 0 || trials < 0) {
+    public PercolationStats(int n, int T) {
+        if (n < 0 || T < 0) {
             throw new IllegalArgumentException();
         }
-        this.size = n;
-        this.trials = trials;
-
+        size = n;
+        trials = T;
         pvals = new double[trials];
+        runtimes = new double[trials];
+
+        for (int i=0; i < trials; i++) {
+            Stopwatch timer = new Stopwatch();
+            Percolation perc = new Percolation(size);
+            while ( ! perc.percolates()) {
+                int x = StdRandom.uniform(1, size+1);
+                int y = StdRandom.uniform(1, size+1);
+                if ( ! perc.isOpen(x, y) ) {
+                    perc.open(x, y);
+                }
+            }
+            pvals[i] = perc.numberOfOpenSites() / ((double) size*size);
+            runtimes[i] = timer.elapsedTime();
+        }
     }
 
     // sample mean of percolation threshold
     public double mean() {
-        mean = StdStats.mean(pvals);
-        return mean;
+        return StdStats.mean(pvals);
     }
 
     // sample standard deviation of percolation threshold
     public double stddev() {
+        if (size == 1) return Double.NaN;
         return StdStats.stddev(pvals);
     }
 
     // low  endpoint of 95% confidence interval
     public double confidenceLo() {
-        if (mean == null)  mean = this.mean();
-        return mean - ( 1.96*this.stddev() / Math.sqrt(trials) );
+        return mean() - ( 1.96*this.stddev() / Math.sqrt(trials) );
     }
 
     // high endpoint of 95% confidence interval
     public double confidenceHi() {
-        if (mean == null)  mean = this.mean();
-        return mean + ( 1.96*this.stddev() / Math.sqrt(trials) );
+        return mean() + ( 1.96*this.stddev() / Math.sqrt(trials) );
     }
 
     // test client
     public static void main(String[] args) {
+
         int n = (args.length > 0)? Integer.parseInt(args[0]): 20;
         int T = (args.length > 1)? Integer.parseInt(args[1]): 10;
 
         PercolationStats stats = new PercolationStats(n, T);
-
-        stats.pvals = new double[T];
-
-        int index = 0;
-        for (int i=0; i < T; i++) {
-            Percolation perc = new Percolation(n);
-
-            for (int j=0; j < n*n; j++) {
-                int x = StdRandom.uniform(1, n+1);
-                int y = StdRandom.uniform(1, n+1);
-
-                if ( ! perc.isFull(x, y) ) {
-                    perc.open(x, y);
-                }
-                if (perc.percolates()) break;
-            }
-
-            stats.pvals[index++] = perc.numberOfOpenSites();
-            System.out.println("Mean                  = " + stats.mean());
-            System.out.println("Standard deviation    = " + stats.stddev());
-            System.out.printf("95 percent confidence = [%f, %f]\n\n",
-                    stats.confidenceHi(), stats.confidenceLo());
-        }
+        StdOut.println("Mean                   = " + stats.mean());
+        StdOut.println("Standard deviation     = " + stats.stddev());
+        StdOut.println("95% percent confidence = ["
+                        + stats.confidenceHi()+ ", "+stats.confidenceLo()+"]");
+//        StdOut.println("Runtime: "+timer.elapsedTime());
     }
 }
