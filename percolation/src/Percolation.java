@@ -23,10 +23,11 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 public class Percolation {
 
     private static final int OPEN = 0;
-    private static final int VIRTUAL = 1;
+    private static final int FULL = 1;
+//    private static final int VIRTUAL = 2;
 
-    private boolean[] sites;
-//    private boolean[][] sites;
+//    private boolean[] sites;
+    private boolean[][] sites;
     private final int size;
     private final WeightedQuickUnionUF unionFind;
     private final int virtualTop;
@@ -39,15 +40,16 @@ public class Percolation {
 
     // create n-by-n grid, with all sites blocked (0)
     // time proportional to n^2
-    Percolation(int n) {
+    public Percolation(int n) {
         if (n < 1) {
             throw new IllegalArgumentException("n must greater than 0.");
         }
         size = n;
         int numSites = n*n;
-        sites = new boolean[numSites];
-//        sites = new boolean[numSites][2];
-        unionFind = new WeightedQuickUnionUF((numSites+5));
+//        sites = new boolean[numSites];
+        sites = new boolean[numSites][2];
+        int listSize = numSites+5;
+        unionFind = new WeightedQuickUnionUF(listSize);
         virtualTop = numSites;
         virtualBottom = numSites+1;
     }
@@ -56,23 +58,21 @@ public class Percolation {
     // constant time
     public void open(int row, int col) {
 
-        validateSiteExist(row, col);
+//        validateSiteExist(row, col);
 
         int site = getId(row, col);
 
         // mark the site as open
-        sites[site] = true;
-//        sites[site][OPEN] = true;
+//        sites[site] = true;
+        sites[site][OPEN] = true;
         openSites++;
 
         // if fist row or last row link to respective virtual node
         if (row == 1) {
             unionFind.union(virtualTop, site);
-//            sites[site][VIRTUAL] = true;
         }
-        else if (row == size) {
+        if (row == size) {
             unionFind.union(virtualBottom, site);
-//            sites[site][VIRTUAL] = true;
         }
 
         // link the site to open neighbors (cardinal directions only)
@@ -80,16 +80,10 @@ public class Percolation {
         if (isUnionable(row-1, col)) { // above
             neighbor = getId(row-1, col);
             unionFind.union(site, neighbor);
-//            if (row-1 == 1) {
-//                sites[neighbor][VIRTUAL] = false;
-//            }
         }
         if (isUnionable(row+1, col)) { // below
             neighbor = getId(row+1, col);
             unionFind.union(site, neighbor);
-//            if (row+1 == size) {
-//                sites[neighbor][VIRTUAL] = false;
-//            }
         }
         if (isUnionable(row, col-1)) { // to the left
             unionFind.union(site, getId(row, col-1));
@@ -97,14 +91,18 @@ public class Percolation {
         if (isUnionable(row, col+1)) { // to the right
             unionFind.union(site, getId(row, col+1));
         }
+
+        if (unionFind.connected(site, virtualTop)) {
+            sites[site][FULL] = true;
+        }
     }
 
     // is site (row, col) open?
     // constant time
     public boolean isOpen(int row, int col) {
         validateSiteExist(row, col);
-        return sites[getId(row, col)];
-//        return sites[getId(row, col)][OPEN];
+//        return sites[getId(row, col)];
+        return sites[getId(row, col)][OPEN];
     }
 
     // is site (row, col) full?
@@ -112,7 +110,7 @@ public class Percolation {
     public boolean isFull(int row, int col) {
         int site = getId(row, col);
         return isOpen(row, col) //&& not connected through a virtual node
-//                && !sites[site][VIRTUAL]
+//                && sites[site][FULL] //TODO: fix backwash
                 && unionFind.connected(virtualTop, site);
     }
 
@@ -164,7 +162,8 @@ public class Percolation {
         while (!grid.percolates()) {
             int x = StdRandom.uniform(1, n+1);
             int y = StdRandom.uniform(1, n+1);
-            if (!grid.isOpen(x, y)) {
+//            if (!grid.isOpen(x, y)) {
+            if (!grid.isFull(x, y)) {
                 grid.open(x, y);
             }
         }

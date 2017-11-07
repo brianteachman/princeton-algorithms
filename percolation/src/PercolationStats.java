@@ -20,20 +20,19 @@ public class PercolationStats {
     private static final double CONFIDENCE = 1.96;
     private final int size;
     private final int trials;
-    private final double[] pvals;
-    private double mean;
-    private double stdDev;
+    private final double mean;
+    private final double stdDev;
 //    private double[] runtimes;
 
     // perform trials independent experiments on an n-by-n grid
-    PercolationStats(int n, int T) {
+    public PercolationStats(int n, int T) {
         if (n < 0 || T <= 0) {
             throw new IllegalArgumentException();
         }
         size = n;
         trials = T;
-        pvals = new double[trials];
 //        runtimes = new double[trials];
+        double[] pvals = new double[trials];
         for (int i = 0; i < trials; i++) {
 //            Stopwatch timer = new Stopwatch();
             Percolation perc = new Percolation(size);
@@ -45,10 +44,10 @@ public class PercolationStats {
                 }
             }
             pvals[i] = perc.numberOfOpenSites() / ((double) size*size);
-            mean = StdStats.mean(pvals);
-            stdDev = StdStats.stddev(pvals);
 //            runtimes[i] = timer.elapsedTime();
         }
+        mean = StdStats.mean(pvals);
+        stdDev = StdStats.stddev(pvals);
     }
 
     // sample mean of percolation threshold
