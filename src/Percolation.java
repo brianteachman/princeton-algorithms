@@ -22,12 +22,16 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
+    private static final int OPEN = 0;
+    private static final int VIRTUAL = 1;
+
     private boolean[] sites;
+//    private boolean[][] sites;
     private final int size;
     private final WeightedQuickUnionUF unionFind;
     private final int virtualTop;
     private final int virtualBottom;
-    private int openSites;
+    private int openSites = 0;
 
     /* ------------------------------------------------------------------------
      * Specified API
@@ -42,7 +46,8 @@ public class Percolation {
         size = n;
         int numSites = n*n;
         sites = new boolean[numSites];
-        unionFind = new WeightedQuickUnionUF(numSites+5);
+//        sites = new boolean[numSites][2];
+        unionFind = new WeightedQuickUnionUF((numSites+5));
         virtualTop = numSites;
         virtualBottom = numSites+1;
     }
@@ -57,24 +62,40 @@ public class Percolation {
 
         // mark the site as open
         sites[site] = true;
+//        sites[site][OPEN] = true;
         openSites++;
 
         // if fist row or last row link to respective virtual node
-        if (row == 1) unionFind.union(virtualTop, site);
-        if (row == size) unionFind.union(virtualBottom, site);
+        if (row == 1) {
+            unionFind.union(virtualTop, site);
+//            sites[site][VIRTUAL] = true;
+        }
+        else if (row == size) {
+            unionFind.union(virtualBottom, site);
+//            sites[site][VIRTUAL] = true;
+        }
 
         // link the site to open neighbors (cardinal directions only)
+        int neighbor;
         if (isUnionable(row-1, col)) { // above
-            unionFind.union(site, getId(row-1, col));
+            neighbor = getId(row-1, col);
+            unionFind.union(site, neighbor);
+//            if (row-1 == 1) {
+//                sites[neighbor][VIRTUAL] = false;
+//            }
+        }
+        if (isUnionable(row+1, col)) { // below
+            neighbor = getId(row+1, col);
+            unionFind.union(site, neighbor);
+//            if (row+1 == size) {
+//                sites[neighbor][VIRTUAL] = false;
+//            }
         }
         if (isUnionable(row, col-1)) { // to the left
             unionFind.union(site, getId(row, col-1));
         }
         if (isUnionable(row, col+1)) { // to the right
             unionFind.union(site, getId(row, col+1));
-        }
-        if (isUnionable(row+1, col)) { // below
-            unionFind.union(site, getId(row+1, col));
         }
     }
 
@@ -83,14 +104,16 @@ public class Percolation {
     public boolean isOpen(int row, int col) {
         validateSiteExist(row, col);
         return sites[getId(row, col)];
+//        return sites[getId(row, col)][OPEN];
     }
 
     // is site (row, col) full?
     // constant time
-//    public boolean isFull(int row, int col) throws IllegalArgumentException {
     public boolean isFull(int row, int col) {
         int site = getId(row, col);
-        return isOpen(row, col) && unionFind.connected(virtualTop, site);
+        return isOpen(row, col) //&& not connected through a virtual node
+//                && !sites[site][VIRTUAL]
+                && unionFind.connected(virtualTop, site);
     }
 
     // number of open sites
