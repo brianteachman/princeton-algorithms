@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *  Author:        Brian Teachman
  *  Written:       11/2/2017
- *  Last updated:  11/4/2017
+ *  Last updated:  11/6/2017
  *
  *  Compilation:   javac PercolationStats.java
  *  Execution:     java PercolationStats <n> <T>
@@ -15,37 +15,37 @@
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
-import edu.princeton.cs.algs4.Stopwatch;
 
 public class PercolationStats {
-    int size;
-    int trials;
+    private final int size;
+    private final int trials;
 
-    double[] pvals;
-    double[] runtimes;
+    private final double[] pvals;
+//    private double[] runtimes;
+    private static final double CONFIDENCE = 1.96;
 
     // perform trials independent experiments on an n-by-n grid
-    public PercolationStats(int n, int T) {
-        if (n < 0 || T < 0) {
+    PercolationStats(int n, int T) {
+        if (n < 0 || T <= 0) {
             throw new IllegalArgumentException();
         }
         size = n;
         trials = T;
         pvals = new double[trials];
-        runtimes = new double[trials];
+//        runtimes = new double[trials];
 
-        for (int i=0; i < trials; i++) {
-            Stopwatch timer = new Stopwatch();
+        for (int i = 0; i < trials; i++) {
+//            Stopwatch timer = new Stopwatch();
             Percolation perc = new Percolation(size);
-            while ( ! perc.percolates()) {
+            while (!perc.percolates()) {
                 int x = StdRandom.uniform(1, size+1);
                 int y = StdRandom.uniform(1, size+1);
-                if ( ! perc.isOpen(x, y) ) {
+                if (!perc.isOpen(x, y)) {
                     perc.open(x, y);
                 }
             }
             pvals[i] = perc.numberOfOpenSites() / ((double) size*size);
-            runtimes[i] = timer.elapsedTime();
+//            runtimes[i] = timer.elapsedTime();
         }
     }
 
@@ -62,21 +62,21 @@ public class PercolationStats {
 
     // low  endpoint of 95% confidence interval
     public double confidenceLo() {
-        return mean() - ( 1.96*this.stddev() / Math.sqrt(trials) );
+        return mean() - (CONFIDENCE *this.stddev() / Math.sqrt(trials));
     }
 
     // high endpoint of 95% confidence interval
     public double confidenceHi() {
-        return mean() + ( 1.96*this.stddev() / Math.sqrt(trials) );
+        return mean() + (CONFIDENCE *this.stddev() / Math.sqrt(trials));
     }
 
     // test client
     public static void main(String[] args) {
 
-        int n = (args.length > 0)? Integer.parseInt(args[0]): 20;
-        int T = (args.length > 1)? Integer.parseInt(args[1]): 10;
+        int n = (args.length > 0) ? Integer.parseInt(args[0]) : 20;
+        int trials = (args.length > 1) ? Integer.parseInt(args[1]) : 10;
 
-        PercolationStats stats = new PercolationStats(n, T);
+        PercolationStats stats = new PercolationStats(n, trials);
         StdOut.println("Mean                   = " + stats.mean());
         StdOut.println("Standard deviation     = " + stats.stddev());
         StdOut.println("95% percent confidence = ["

@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  *  Author:        Brian Teachman
  *  Written:       10/27/2017
- *  Last updated:  11/4/2017
+ *  Last updated:  11/6/2017
  *
  *  Compilation:   javac Percolation.java
  *  Execution:     java Percolation
@@ -22,11 +22,11 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
-    boolean[] sites;
-    int size;
-    WeightedQuickUnionUF unionFind;
-    int virtualTop;
-    int virtualBottom;
+    private boolean[] sites;
+    private final int size;
+    private final WeightedQuickUnionUF unionFind;
+    private final int virtualTop;
+    private final int virtualBottom;
     private int openSites;
 
     /* ------------------------------------------------------------------------
@@ -35,14 +35,14 @@ public class Percolation {
 
     // create n-by-n grid, with all sites blocked (0)
     // time proportional to n^2
-    public Percolation(int n) {
+    Percolation(int n) {
         if (n < 1) {
             throw new IllegalArgumentException("n must greater than 0.");
         }
         size = n;
         int numSites = n*n;
         sites = new boolean[numSites];
-        unionFind = new WeightedQuickUnionUF(numSites+6);
+        unionFind = new WeightedQuickUnionUF(numSites+5);
         virtualTop = numSites;
         virtualBottom = numSites+1;
     }
@@ -80,14 +80,15 @@ public class Percolation {
 
     // is site (row, col) open?
     // constant time
-    public boolean isOpen(int row, int col) throws IllegalArgumentException {
+    public boolean isOpen(int row, int col) {
         validateSiteExist(row, col);
         return sites[getId(row, col)];
     }
 
     // is site (row, col) full?
     // constant time
-    public boolean isFull(int row, int col) throws IllegalArgumentException {
+//    public boolean isFull(int row, int col) throws IllegalArgumentException {
+    public boolean isFull(int row, int col) {
         int site = getId(row, col);
         return isOpen(row, col) && unionFind.connected(virtualTop, site);
     }
@@ -113,8 +114,8 @@ public class Percolation {
     }
 
     // validate the index of the received site
-    private void validateSiteExist(int row, int col) throws IllegalArgumentException {
-        if ( ! isValidIndex(row, col)) {
+    private void validateSiteExist(int row, int col) {
+        if (!isValidIndex(row, col)) {
             throw new IllegalArgumentException("Valid scalars are 1-"+size+". <"+row+", "+col+">");
         }
     }
@@ -134,17 +135,17 @@ public class Percolation {
      * ----------------------------------------------------------------------*/
 
     public static void main(String[] args) {
-        int n = (args.length > 0)? Integer.parseInt(args[0]): 20;
+        int n = (args.length > 0) ? Integer.parseInt(args[0]) : 20;
         Percolation grid = new Percolation(n);
 
-        while ( ! grid.percolates()) {
+        while (!grid.percolates()) {
             int x = StdRandom.uniform(1, n+1);
             int y = StdRandom.uniform(1, n+1);
-            if ( ! grid.isOpen(x, y) ) {
+            if (!grid.isOpen(x, y)) {
                 grid.open(x, y);
             }
         }
         StdOut.println(grid.numberOfOpenSites() + " sites opened.");
-        StdOut.println(grid.percolates()?"It percolates.":"No percolation here.");
+//        StdOut.println(grid.percolates() ? "It percolates." : "No percolation here.");
     }
 }
