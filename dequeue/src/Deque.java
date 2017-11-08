@@ -11,6 +11,8 @@ import java.util.NoSuchElementException;
  */
 public class Deque<Item> implements Iterable<Item> {
 
+    private int count = 0;
+
     private class Node {
         Item item;
         Node next;
@@ -26,11 +28,12 @@ public class Deque<Item> implements Iterable<Item> {
     // is the deque empty?
     public boolean isEmpty() {
         return first == null && last == null;
+//        return count == 0;
     }
 
     // return the number of items on the deque
     public int size() {
-        return -1;
+        return count;
     }
 
     // add the item to the front
@@ -38,7 +41,13 @@ public class Deque<Item> implements Iterable<Item> {
         if (item == null) {
             throw new IllegalArgumentException();
         }
-
+        Node oldfirst = first;
+        first = new Node();
+        first.item = item;
+        if (!isEmpty()) {
+            first.next = oldfirst;
+        }
+        count++;
     }
 
     // add the item to the end
@@ -56,6 +65,7 @@ public class Deque<Item> implements Iterable<Item> {
         else {
             oldlast.next = last;
         }
+        count++;
     }
 
     // remove and return the item from the front
@@ -63,6 +73,8 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
+        count--;
+
         return first.item;
     }
 
@@ -71,6 +83,8 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
+        count--;
+
         return last.item;
     }
 
@@ -95,8 +109,12 @@ public class Deque<Item> implements Iterable<Item> {
         }
     }
 
-    // unit testing (optional)
+    // unit testing
     public static void main(String[] args) {
+
+        Deque<Integer> deck = new Deque<>();
+
+
 
     }
 }
