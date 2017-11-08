@@ -55,6 +55,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         return new RandomGetIterator();
     }
 
+    /**
+     * Return the items in uniformly random order.
+     */
     private class RandomGetIterator implements Iterator<Item> {
         private Node current = first;
         public boolean hasNext() { return current != null; }
