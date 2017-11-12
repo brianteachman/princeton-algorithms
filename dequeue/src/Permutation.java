@@ -1,3 +1,5 @@
+import java.util.NoSuchElementException;
+
 /**
  * Write a client program Permutation.java that takes an integer k
  * as a command-line argument; reads in a sequence of strings from
@@ -17,5 +19,30 @@ public class Permutation {
      */
     public static void main(String[] args) {
 
+//        int k = Integer.parseInt(args[0]);
+        int k = 3;
+        RandomizedQueue<String> sub = new RandomizedQueue<String>();
+        Deque<String> deck = new Deque<String>();
+
+        try
+        {
+//            String values = StdIn.readString();
+            String values = "A B C D E F G H I";
+            while(values != null)
+            {
+                sub.enqueue(values);
+                values = StdIn.readString();
+            }
+        }
+        catch(NoSuchElementException e)
+        {
+
+        }
+
+        while(k > 0)
+        {
+            k--;
+            StdOut.println(sub.dequeue());
+        }
     }
 }

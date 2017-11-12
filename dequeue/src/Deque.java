@@ -1,5 +1,8 @@
+import edu.princeton.cs.algs4.StdOut;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 /**
  * Deque: Double ended queue
@@ -11,24 +14,42 @@ import java.util.NoSuchElementException;
  */
 public class Deque<Item> implements Iterable<Item> {
 
-    private int count = 0;
+    private static final String ERROR_EMPTY = "This deque is empty.";
 
     private class Node {
         Item item;
         Node next;
+        public String toString() {
+            return "this: "+item+", next: "+next+"\n";
+        }
     }
 
-    private Node first, last;
+    private Node first, last, oldlast;
+    private int count;
 
     // construct an empty deque
     public Deque() {
+        first = null;
+        last = null;
+        oldlast = null;
+        count = 0;
+    }
 
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("[ ");
+        int y = 1, z = this.size();
+        for (Item item : this) {
+            s.append(item);
+            if (y++ != z) s.append(", ");
+        }
+        s.append(" ]");
+        return s.toString();
     }
 
     // is the deque empty?
     public boolean isEmpty() {
-        return first == null && last == null;
-//        return count == 0;
+        return count == 0;
     }
 
     // return the number of items on the deque
@@ -44,7 +65,9 @@ public class Deque<Item> implements Iterable<Item> {
         Node oldfirst = first;
         first = new Node();
         first.item = item;
-        if (!isEmpty()) {
+        if (isEmpty()) {
+            last = first;
+        } else {
             first.next = oldfirst;
         }
         count++;
@@ -55,14 +78,13 @@ public class Deque<Item> implements Iterable<Item> {
         if (item == null) {
             throw new IllegalArgumentException();
         }
-        Node oldlast = last;
+        oldlast = last;
         last = new Node();
         last.item = item;
         last.next = null;
         if (isEmpty()) {
             first = last;
-        }
-        else {
+        } else {
             oldlast.next = last;
         }
         count++;
@@ -73,9 +95,10 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
+        Item item = first.item;
+        first = first.next;
         count--;
-
-        return first.item;
+        return item;
     }
 
     // remove and return the item from the end
@@ -83,9 +106,11 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
+        Item item = last.item;
+        last = oldlast;
+        last.next = null;
         count--;
-
-        return last.item;
+        return item;
     }
 
     // return an iterator over items in order from front to end
@@ -113,8 +138,22 @@ public class Deque<Item> implements Iterable<Item> {
     public static void main(String[] args) {
 
         Deque<Integer> deck = new Deque<>();
+        System.out.println("Count 0: "+deck);
+        deck.addFirst(3);
+        deck.addFirst(2);
+        deck.addFirst(4);
+        deck.addLast(5);
+        deck.addLast(1);
+        System.out.println("Count 1: "+deck);
 
+//        System.out.println("popped "+deck.removeLast()+" "+deck);
+//        deck.addLast(deck.removeFirst());
+//        System.out.println("dequeued "+deck.removeFirst()+" "+deck);
+//        System.out.println("dequeued "+deck.removeFirst()+" "+deck);
+//        System.out.println("popped "+deck.removeLast()+" "+deck);
 
-
+        for (int i : deck) {
+            StdOut.print(i+", ");
+        }
     }
 }
