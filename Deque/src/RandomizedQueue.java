@@ -79,6 +79,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     // return the items in uniformly random order.
     private class RandomGetIterator implements Iterator<Item> {
         private Item[] copy;
+        // TODO: make 2D
         int copyhead;
         public RandomGetIterator() {
             copyhead = 0;
