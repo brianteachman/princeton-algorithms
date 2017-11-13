@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
 
-class TestDequeArray {
+class LinkedDequeTests {
 
     @Test
     void dequeSizeTest() {
-        DequeArray<String> deck = new DequeArray<String>();
+        LinkedDeque<String> deck = new LinkedDeque<String>();
         deck.addFirst("A");
         deck.addFirst("E");
         assertEquals(2, deck.size());
@@ -24,7 +24,7 @@ class TestDequeArray {
 
     @Test
     void removeFirstTest() {
-        DequeArray<String> deck = new DequeArray<String>();
+        LinkedDeque<String> deck = new LinkedDeque<String>();
         deck.addFirst("B");
         deck.addFirst("A");
         deck.addLast("C");
@@ -38,7 +38,7 @@ class TestDequeArray {
 
     @Test
     void removeLastTest() {
-        DequeArray<String> deck = new DequeArray<String>();
+        LinkedDeque<String> deck = new LinkedDeque<String>();
         deck.addFirst("B");
         deck.addFirst("A");
         deck.addLast("C");
@@ -52,7 +52,7 @@ class TestDequeArray {
 
     @Test
     void removeFirstThrowsExceptionIfEmptyTest() {
-        DequeArray<String> emptyDeck = new DequeArray<String>();
+        LinkedDeque<String> emptyDeck = new LinkedDeque<String>();
         Throwable exception = assertThrows(NoSuchElementException.class, () -> {
             emptyDeck.removeFirst();
         });
@@ -60,7 +60,7 @@ class TestDequeArray {
 
     @Test
     void removeLastThrowsExceptionIfEmptyTest() {
-        DequeArray<String> emptyDeck = new DequeArray<String>();
+        LinkedDeque<String> emptyDeck = new LinkedDeque<String>();
         Throwable exception = assertThrows(NoSuchElementException.class, () -> {
             emptyDeck.removeLast();
         });
@@ -68,7 +68,7 @@ class TestDequeArray {
 
     @Test
     void isEmptyTest() {
-        DequeArray<String> deck = new DequeArray<String>();
+        LinkedDeque<String> deck = new LinkedDeque<String>();
         assertTrue(deck.isEmpty());
         deck.addFirst("B");
         assertFalse(deck.isEmpty());
@@ -81,4 +81,3 @@ class TestDequeArray {
         assertFalse(deck.isEmpty());
     }
 }
-

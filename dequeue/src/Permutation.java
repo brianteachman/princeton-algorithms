@@ -1,4 +1,5 @@
-import java.util.NoSuchElementException;
+import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
 
 /**
  * Write a client program Permutation.java that takes an integer k
@@ -9,7 +10,7 @@ import java.util.NoSuchElementException;
  *
  * Performance:
  * 1.) The running time of Permutation must be linear in the size of the input.
- * 2.) You may use only a constant amount of memory plus either one Deque or
+ * 2.) You may use only a constant amount of memory plus either one LinkedDeque or
  *     RandomizedQueue object of maximum size at most n.
  */
 public class Permutation {
@@ -18,31 +19,17 @@ public class Permutation {
      * Assume that 0 ≤ k ≤ n, where n is the number of strings on standard input.
      */
     public static void main(String[] args) {
+        RandomizedQueue<String> rque = new RandomizedQueue<String>();
 
-//        int k = Integer.parseInt(args[0]);
-        int k = 3;
-        RandomizedQueue<String> sub = new RandomizedQueue<String>();
-        Deque<String> deck = new Deque<String>();
+        int k = Integer.parseInt(args[0]);
 
-        try
-        {
-//            String values = StdIn.readString();
-            String values = "A B C D E F G H I";
-            while(values != null)
-            {
-                sub.enqueue(values);
-                values = StdIn.readString();
-            }
-        }
-        catch(NoSuchElementException e)
-        {
-
+        while (!StdIn.isEmpty()) {
+            rque.enqueue(StdIn.readString());
         }
 
-        while(k > 0)
-        {
+        while (k > 0) {
             k--;
-            StdOut.println(sub.dequeue());
+            StdOut.println(rque.sample());
         }
     }
 }

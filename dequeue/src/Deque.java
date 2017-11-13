@@ -1,11 +1,10 @@
-import edu.princeton.cs.algs4.StdOut;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Random;
+import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.StdRandom;
 
 /**
- * Deque: Double ended queue
+ * LinkedDeque: Double ended queue
  *
  * Performance requirements:
  * 1.) All deque and iterator operations within constant worst-case time.
@@ -14,37 +13,20 @@ import java.util.Random;
  */
 public class Deque<Item> implements Iterable<Item> {
 
+    private static final int STARTING_SIZE = 8;
     private static final String ERROR_EMPTY = "This deque is empty.";
 
-    private class Node {
-        Item item;
-        Node next;
-        public String toString() {
-            return "this: "+item+", next: "+next+"\n";
-        }
-    }
-
-    private Node first, last, oldlast;
-    private int count;
+    private Item[] nodes;
+    private int count, head, tail; // tail - head = count
+    private int size;          // current max number of elements
 
     // construct an empty deque
     public Deque() {
-        first = null;
-        last = null;
-        oldlast = null;
+        size = STARTING_SIZE;
+        nodes = newItemArray(size);
+        head = (size / 2) - 1;
+        tail = (size / 2);
         count = 0;
-    }
-
-    public String toString() {
-        StringBuilder s = new StringBuilder();
-        s.append("[ ");
-        int y = 1, z = this.size();
-        for (Item item : this) {
-            s.append(item);
-            if (y++ != z) s.append(", ");
-        }
-        s.append(" ]");
-        return s.toString();
     }
 
     // is the deque empty?
@@ -62,15 +44,11 @@ public class Deque<Item> implements Iterable<Item> {
         if (item == null) {
             throw new IllegalArgumentException();
         }
-        Node oldfirst = first;
-        first = new Node();
-        first.item = item;
-        if (isEmpty()) {
-            last = first;
-        } else {
-            first.next = oldfirst;
-        }
+        nodes[head--] = item;
         count++;
+        if (head == 0) {
+            resize(nodes);
+        }
     }
 
     // add the item to the end
@@ -78,39 +56,35 @@ public class Deque<Item> implements Iterable<Item> {
         if (item == null) {
             throw new IllegalArgumentException();
         }
-        oldlast = last;
-        last = new Node();
-        last.item = item;
-        last.next = null;
-        if (isEmpty()) {
-            first = last;
-        } else {
-            oldlast.next = last;
-        }
+        nodes[tail++] = item;
         count++;
+        if (tail == size-1) {
+            resize(nodes);
+        }
     }
 
     // remove and return the item from the front
     public Item removeFirst() {
         if (isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException(ERROR_EMPTY);
         }
-        Item item = first.item;
-        first = first.next;
+        head += 1;
+        Item val = nodes[head];
+        nodes[head] = null;
         count--;
-        return item;
+        return val;
     }
 
     // remove and return the item from the end
     public Item removeLast() {
         if (isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException(ERROR_EMPTY);
         }
-        Item item = last.item;
-        last = oldlast;
-        last.next = null;
+        tail -= 1;
+        Item val = nodes[tail];
+        nodes[tail] = null;
         count--;
-        return item;
+        return val;
     }
 
     // return an iterator over items in order from front to end
@@ -119,41 +93,89 @@ public class Deque<Item> implements Iterable<Item> {
     }
 
     private class DequeIterator implements Iterator<Item> {
-        private Node current = first;
-        public boolean hasNext() { return current != null; }
+        private int current = head;
+        public boolean hasNext() { return current < tail-1; }
         public void remove() {
             throw new UnsupportedOperationException();
         }
         public Item next() {
-            if (isEmpty()) {
+            if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            Item item = current.item;
-            current = current.next;
-            return item;
+            return nodes[++current]; // increment from head to next value
         }
     }
+
+    private void resize(Item[] items) {
+        Item[] clone = items.clone();
+        size *= 2;
+        head = (size/2)-1;
+        tail = (size/2);
+        nodes = newItemArray(size);
+
+        for (int i = 0; i < (clone.length/2); i++) {
+            int j = ((clone.length/2)-1)-i;
+            int k = (clone.length/2)+i;
+            if (clone[j] != null) nodes[head--] = clone[j];
+            if (clone[k] != null) nodes[tail++] = clone[k];
+        }
+    }
+
+    private Item[] newItemArray(int capacity) {
+        return (Item[]) new Object[capacity];
+    }
+
+    //    public String toString() {
+//        StringBuilder s = new StringBuilder();
+//        s.append("[ ");
+//        int y = 0, z = this.size();
+//        for (Item item : this) {
+//            s.append(item);
+//            if (y++ != z) s.append(", ");
+//        }
+//        s.append(" ]");
+//        return s.toString();
+//    }
+
+    // ------------------------------------------------------------------------
 
     // unit testing
     public static void main(String[] args) {
 
-        Deque<Integer> deck = new Deque<>();
-        System.out.println("Count 0: "+deck);
-        deck.addFirst(3);
-        deck.addFirst(2);
-        deck.addFirst(4);
-        deck.addLast(5);
-        deck.addLast(1);
-        System.out.println("Count 1: "+deck);
+        Deque<Integer> deck = new Deque<Integer>();
 
-//        System.out.println("popped "+deck.removeLast()+" "+deck);
+        // test mutators
+//        deck.addFirst(2);
+//        deck.addFirst(1);
+//        deck.addLast(3);
+//        deck.addLast(4);
+//        StdOut.println("           "+deck);
+//        StdOut.println("dequeued "+deck.removeFirst()+" "+deck);
+//        deck.addFirst(2);
+//        StdOut.println("queued   2 "+deck);
+//        StdOut.println("dequeued "+deck.removeFirst()+" "+deck);
 //        deck.addLast(deck.removeFirst());
-//        System.out.println("dequeued "+deck.removeFirst()+" "+deck);
-//        System.out.println("dequeued "+deck.removeFirst()+" "+deck);
-//        System.out.println("popped "+deck.removeLast()+" "+deck);
+//        StdOut.println("roll over  "+deck);
+//        StdOut.println("popped   "+deck.removeLast()+" "+deck);
+//        deck.addLast(2);
+//        StdOut.println("push     2 "+deck);
 
-        for (int i : deck) {
-            StdOut.print(i+", ");
+        StdOut.println("           "+deck);
+
+        // test resize
+        for (int i = 0; i < 20; i++) {
+            int rnum = StdRandom.uniform(20)+1;
+            if (i % 2 == 0) {
+                deck.addFirst(rnum);
+            }
+            else {
+                deck.addLast(rnum);
+            }
+//            StdOut.println("Count "+deck.size()+": "+deck);
         }
+        StdOut.println(deck.size());
+//        for (int i : deck) {
+//            StdOut.println(i);
+//        }
     }
 }

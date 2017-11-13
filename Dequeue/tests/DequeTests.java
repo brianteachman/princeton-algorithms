@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
 
-class TestDeque {
+class DequeTests {
 
     @Test
     void dequeSizeTest() {
@@ -81,3 +81,4 @@ class TestDeque {
         assertFalse(deck.isEmpty());
     }
 }
+
