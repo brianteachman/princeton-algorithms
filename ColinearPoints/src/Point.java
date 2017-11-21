@@ -83,18 +83,12 @@ public class Point implements Comparable<Point> {
             return 1;
         }
     };
-//    public final Comparator<Point> SLOPE_ORDER = new slopeOrder();
-//    private class slopeOrder implements Comparator<Point> {
-//        public int compare(Point p1, Point p2) {
-//            double sp1 = slopeTo(p1);
-//            double sp2 = slopeTo(p2);
-//            if (sp1 == sp2) return 0;
-//            if (sp1 < sp2) return -1;
-//            return 1;
-//        }
-//    }
+
+    private double distance(Point q) {
+        return Math.sqrt((q.x - x) * (q.x - x) + (q.y - y) * (q.y - y));
+    }
 
     public static void main(String[] args) {
-        
+
     }
 }

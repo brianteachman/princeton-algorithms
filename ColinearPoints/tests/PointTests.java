@@ -101,9 +101,8 @@ class PointTests {
         pnts[1] = new Point(2, 3);
         pnts[2] = new Point(1, 1);
         pnts[3] = new Point(1, 0);
-//        Arrays.sort(pnts, pnts[0].SLOPE_ORDER);
-        Arrays.sort(pnts, pnts[0].SLOPE_ORDER);
-        assertEquals( 0, 0);
+        Arrays.sort(pnts, pnts[3].SLOPE_ORDER);
+        assertEquals( 0, pnts[0]);
     }
 
 }
