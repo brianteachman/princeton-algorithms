@@ -22,8 +22,8 @@ public class FastCollinearPoints {
      * @return
      */
     public LineSegment[] segments() {
-        LineSegment[] lseg = new LineSegment[count];
+        LineSegment[] segs = new LineSegment[count];
 
-        return lseg;
+        return segs;
     }
 }
