@@ -3,9 +3,14 @@
  * ---------------------------------------------------------------*/
 public class FastCollinearPoints {
 
+    private int count;
+    private Point[] list;
+
     // finds all line segments containing 4 points
     public FastCollinearPoints(Point[] points) {
-
+        count = 0;
+//        list = new Point[points.length];
+        list = points;
     }
 
     /**
@@ -16,5 +21,9 @@ public class FastCollinearPoints {
      *
      * @return
      */
-//    public LineSegment[] segments() {}
+    public LineSegment[] segments() {
+        LineSegment[] lseg = new LineSegment[count];
+
+        return lseg;
+    }
 }
